@@ -35,6 +35,10 @@ def convert_to_row(arr):
     return row_dict
 
 
+def convert_to_chart(arr):
+    return {i: x for i, x in enumerate(arr)}
+
+
 @app.route('/', methods=['GET'])
 def home():
     return '', 404
@@ -101,9 +105,14 @@ def set_table():
         row = convert_to_row([cols_arr[j][i] if i < len(cols_arr[j]) else None for j in range(cols_count)])
         rows_arr.append(row)
 
+    charts_arr = []
+    for arr in cols_arr:
+        charts_arr.append(convert_to_chart(arr))
+
     return jsonify({
         'table_rows': rows_arr,
         'rows_count': rows_count,
+        'charts': charts_arr,
     }), 200
 
 
