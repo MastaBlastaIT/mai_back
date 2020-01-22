@@ -36,7 +36,7 @@ def convert_to_row(arr):
 
 
 def convert_to_chart(arr):
-    return {i: x for i, x in enumerate(arr)}
+    return [{"step_index": i, "step_value": x} for i, x in enumerate(arr)]
 
 
 @app.route('/', methods=['GET'])
