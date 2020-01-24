@@ -1,7 +1,7 @@
 import json, math
 
 from flask import Flask, request, jsonify
-from numpy.random import uniform
+from random import uniform
 from flask_cors import CORS
 
 app = Flask(__name__)
@@ -10,7 +10,12 @@ app.config["DEBUG"] = True
 
 
 def generate_initials_list(count):
-    return uniform(1.1, 59.9, count)
+    first = 1.1
+    res_arr = []
+    for i in range(count):
+        res_arr.append(uniform(first, first + 3))
+        first += 10
+    return res_arr
 
 
 def nth_root_row(a, n, initial_guess):
@@ -36,7 +41,26 @@ def convert_to_row(arr):
 
 
 def convert_to_chart(arr):
-    return [{"step_index": i, "step_value": x} for i, x in enumerate(arr)]
+    chart_arr = []
+    for i, x in enumerate(arr):
+        if x <= 165:
+            chart_arr.append({"step_index": i, "step_value": x})
+    return chart_arr
+
+
+def truncate(f, n):
+    return math.floor(f * 10 ** n) / 10 ** n
+
+
+def remove_duplicates(arr):
+    return list(set(arr))
+
+
+def find_max_chart_value(charts):
+    max_arr = []
+    for chart_arr in charts:
+        max_arr.append(max([chart_dict['step_value'] for chart_dict in chart_arr]))
+    return math.floor(max(max_arr))
 
 
 @app.route('/', methods=['GET'])
@@ -109,10 +133,18 @@ def set_table():
     for arr in cols_arr:
         charts_arr.append(convert_to_chart(arr))
 
+    y_tick_arr = [math.floor(x) for x in list(rows_arr[0].values())]
+    y_tick_arr.append(truncate(cols_arr[0][len(cols_arr[0]) - 1], 2))
+
+    max_step = find_max_chart_value(charts_arr)
+
+    y_tick_arr += [max_step, max_step + 5]
+
     return jsonify({
         'table_rows': rows_arr,
         'rows_count': rows_count,
         'charts': charts_arr,
+        'y_tick_values': sorted(remove_duplicates(y_tick_arr)),
     }), 200
 
 
