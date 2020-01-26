@@ -1,12 +1,11 @@
 import json, math
 
-from flask import Flask, request, jsonify
+from flask_app import app
+from flask import request, jsonify
 from random import uniform
 from flask_cors import CORS
 
-app = Flask(__name__)
 cors = CORS(app, resources={r"/set_table": {"origins": "*"}}, methods=['POST'])
-app.config["DEBUG"] = True
 
 
 def generate_initials_list(count):
@@ -61,11 +60,6 @@ def find_max_chart_value(charts):
     for chart_arr in charts:
         max_arr.append(max([chart_dict['step_value'] for chart_dict in chart_arr]))
     return math.floor(max(max_arr))
-
-
-@app.route('/', methods=['GET'])
-def home():
-    return '', 404
 
 
 @app.route('/set_table', methods=['POST'])
@@ -146,6 +140,3 @@ def set_table():
         'charts': charts_arr,
         'y_tick_values': sorted(remove_duplicates(y_tick_arr)),
     }), 200
-
-
-app.run()
