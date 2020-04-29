@@ -5,7 +5,7 @@ from flask import request, jsonify
 from random import uniform
 from flask_cors import CORS
 
-cors = CORS(app, resources={r"/set_table": {"origins": "*"}}, methods=['POST'])
+cors = CORS(app, resources={r"/set_table": {"origins": "*"}}, methods=["POST"])
 
 
 def generate_initials_list(count):
@@ -34,7 +34,7 @@ def convert_to_row(arr):
     row_dict = {}
     for i, x in enumerate(arr):
         prefix = i // 26
-        prefix_letter = '' if prefix == 0 else chr(prefix + 64)
+        prefix_letter = "" if prefix == 0 else chr(prefix + 64)
         row_dict[prefix_letter + chr((i % 26) + 65)] = x
     return row_dict
 
@@ -58,56 +58,58 @@ def remove_duplicates(arr):
 def find_max_chart_value(charts):
     max_arr = []
     for chart_arr in charts:
-        max_arr.append(max([chart_dict['step_value'] for chart_dict in chart_arr]))
+        max_arr.append(max([chart_dict["step_value"] for chart_dict in chart_arr]))
     return math.floor(max(max_arr))
 
 
-@app.route('/set_table', methods=['POST'])
+@app.route("/set_table", methods=["POST"])
 def set_table():
-    errors_dict = {'errors': []}
+    errors_dict = {"errors": []}
     cols_count = 0
     variable = 0.0
     exponent = 0
     initials_array = []
 
     try:
-        cols_count = int(request.form['cols_count'])
+        cols_count = int(request.form["cols_count"])
     except ValueError:
-        errors_dict['errors'].append({
-            'cols_count': 'is not integer',
-        })
+        errors_dict["errors"].append(
+            {"cols_count": "is not integer",}
+        )
 
     try:
-        variable = float(request.form['variable'])
+        variable = float(request.form["variable"])
     except ValueError:
-        errors_dict['errors'].append({
-            'variable': 'is not number',
-        })
+        errors_dict["errors"].append(
+            {"variable": "is not number",}
+        )
 
     try:
-        exponent = int(request.form['exponent'])
+        exponent = int(request.form["exponent"])
     except ValueError:
-        errors_dict['errors'].append({
-            'exponent': 'is not integer',
-        })
+        errors_dict["errors"].append(
+            {"exponent": "is not integer",}
+        )
 
     try:
-        initials_array_field = request.form.get('initials_array', '[]')
+        initials_array_field = request.form.get("initials_array", "[]")
         initials_array = json.loads(initials_array_field)
         if type(initials_array) is not list:
             raise TypeError
     except (json.decoder.JSONDecodeError, TypeError):
-        errors_dict['errors'].append({
-            'initials_array': 'is not list',
-        })
+        errors_dict["errors"].append(
+            {"initials_array": "is not list",}
+        )
 
-    if len(errors_dict['errors']) > 0:
+    if len(errors_dict["errors"]) > 0:
         return jsonify(errors_dict), 400
 
     if len(initials_array) <= 0:
         initials_array = generate_initials_list(cols_count)
     elif len(initials_array) < cols_count:
-        additional_array = list(generate_initials_list(cols_count - len(initials_array)))
+        additional_array = list(
+            generate_initials_list(cols_count - len(initials_array))
+        )
         initials_array += additional_array
     else:
         initials_array = initials_array[:cols_count]
@@ -120,7 +122,12 @@ def set_table():
     rows_count = max([len(x) for x in cols_arr])
     rows_arr = []
     for i in range(rows_count):
-        row = convert_to_row([cols_arr[j][i] if i < len(cols_arr[j]) else None for j in range(cols_count)])
+        row = convert_to_row(
+            [
+                cols_arr[j][i] if i < len(cols_arr[j]) else None
+                for j in range(cols_count)
+            ]
+        )
         rows_arr.append(row)
 
     charts_arr = []
@@ -134,9 +141,14 @@ def set_table():
 
     y_tick_arr += [max_step, max_step + 5]
 
-    return jsonify({
-        'table_rows': rows_arr,
-        'rows_count': rows_count,
-        'charts': charts_arr,
-        'y_tick_values': sorted(remove_duplicates(y_tick_arr)),
-    }), 200
+    return (
+        jsonify(
+            {
+                "table_rows": rows_arr,
+                "rows_count": rows_count,
+                "charts": charts_arr,
+                "y_tick_values": sorted(remove_duplicates(y_tick_arr)),
+            }
+        ),
+        200,
+    )
