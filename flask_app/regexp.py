@@ -1,8 +1,13 @@
 import re
 
-from flask_app import app, mysql
+from flask_app import app
 from flask import request, jsonify
 from flask_cors import CORS
+from flask_mysqldb import MySQL
+
+app.config["MYSQL_DB"] = "mastaBlastaIT$regexp_texts"
+
+mysql = MySQL(app)
 
 cors = CORS(app, resources={r"/regexp_find": {"origins": "*"}}, methods=["POST"])
 

@@ -1,17 +1,13 @@
 import os, git, hmac, hashlib
 
 from flask import Flask, request
-from flask_mysqldb import MySQL
 
 app = Flask(__name__)
 
 # MySQL pythonanywhere configurations
 app.config["MYSQL_USER"] = "mastaBlastaIT"
 app.config["MYSQL_PASSWORD"] = "9@RYKQTWHtw38qP"
-app.config["MYSQL_DB"] = "mastaBlastaIT$regexp_texts"
 app.config["MYSQL_HOST"] = "mastaBlastaIT.mysql.pythonanywhere-services.com"
-
-mysql = MySQL(app)
 
 
 @app.route("/", methods=["GET"])
